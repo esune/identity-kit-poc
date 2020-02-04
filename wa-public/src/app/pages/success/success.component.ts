@@ -447,37 +447,37 @@ export class SuccessComponent implements OnInit, OnDestroy {
       {
         label: 'First Name',
         key: 'firstName',
-        value: values.firstName || 'not defined',
+        value: values.firstName,
       },
       {
         label: 'Last Name',
         key: 'lastName',
-        value: values.lastName || 'not defined',
+        value: values.lastName,
       },
       {
         label: 'Email Address',
         key: 'emailAddress',
-        value: values.emailAddress || 'not defined',
+        value: values.emailAddress,
       },
       {
         label: 'Street Address',
         key: 'streetAddress',
-        value: values.streetAddress || 'not defined',
+        value: values.streetAddress,
       },
       {
         label: 'Postal Code',
         key: 'postalCode',
-        value: values.postalCode || 'not defined',
+        value: values.postalCode,
       },
       {
         label: 'Locality',
         key: 'locality',
-        value: values.locality || 'not defined',
+        value: values.locality,
       },
       {
         label: 'Date of Birth',
         key: 'dateOfBirth',
-        value: values.dateOfBirth || 'not defined',
+        value: values.dateOfBirth,
       },
     ];
 

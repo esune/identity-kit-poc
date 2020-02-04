@@ -1,0 +1,67 @@
+[
+  {
+    "type": "textInput",
+    "label": "First Name",
+    "fieldName": "firstName",
+    "placeholder": "John",
+    "validators": [
+      "required"
+    ]
+  },
+  {
+    "type": "textInput",
+    "label": "Last Name",
+    "fieldName": "lastName",
+    "placeholder": "Doe",
+    "validators": [
+      "required"
+    ]
+  },
+  {
+    "type": "textInput",
+    "label": "E-mail Address",
+    "fieldName": "emailAddress",
+    "placeholder": "email@example.com",
+    "validators": [
+      "required",
+      "email"
+    ]
+  },
+  {
+    "type": "textInput",
+    "label": "Street Address",
+    "fieldName": "streetAddress",
+    "placeholder": "123 Identity Way",
+    "validators": [
+      "required"
+    ]
+  },
+  {
+    "type": "textInput",
+    "label": "Postal Code",
+    "fieldName": "postalCode",
+    "placeholder": "A1B 2C3",
+    "validators": [
+      "required"
+    ]
+  },
+  {
+    "type": "textInput",
+    "label": "Locality",
+    "fieldName": "locality",
+    "placeholder": "CityName",
+    "validators": [
+      "required"
+    ]
+  },
+  {
+    "type": "date",
+    "label": "Date of Birth",
+    "fieldName": "dateOfBirth",
+    "placeholder": "01/01/1970",
+    "fieldFormat": "mediumDate",
+    "validators": [
+      "required"
+    ]
+  }
+]

@@ -34,11 +34,18 @@ import { CompletedComponent } from './pages/completed/completed.component';
 import { SuccessComponent } from './pages/success/success.component';
 import { TrackComponent } from './pages/track/track.component';
 import { AppConfigService } from './services/app-config.service';
+import { FormConfigService } from './services/form-config.service';
 
 const keycloakService = new KeycloakService();
 
-export function initializeApp(appConfigService: AppConfigService) {
-  return () => appConfigService.load();
+export function initializeApp(
+  appConfigService: AppConfigService,
+  formConfigService: FormConfigService,
+) {
+  return () =>
+    appConfigService.load().then(success => {
+      return formConfigService.load();
+    });
 }
 
 const matModules = [
@@ -91,10 +98,11 @@ const components = [
       useValue: keycloakService,
     },
     AppConfigService,
+    FormConfigService,
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
-      deps: [AppConfigService],
+      deps: [AppConfigService, FormConfigService],
       multi: true,
     },
   ],
