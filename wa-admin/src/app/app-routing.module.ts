@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-import { CanActivateGuard } from './guards/can-activate.guard';
+import { AuthorizationGuard } from './guards/authorization.guard';
+import { AutoLoginComponent } from './components/auto-login/auto-login.component';
 
 const routes: Routes = [
+  { path: '', component: AutoLoginComponent },
   {
-    path: '',
-    canActivate: [CanActivateGuard],
-    data: { roles: ['wa-admin'] },
+    path: 'home',
     loadChildren: () =>
       import('./pages/home/home.module').then(m => m.HomePageModule)
   },

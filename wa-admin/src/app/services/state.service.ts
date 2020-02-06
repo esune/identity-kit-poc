@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { BehaviorSubject } from 'rxjs';
 import { IInvitationRecord } from '../shared/interfaces/invitation-record.interface';
-import { KeycloakService } from 'keycloak-angular';
 
 export type StateType = 'invited' | 'confirmed';
 
@@ -62,7 +62,9 @@ export class StateService {
     this.$$userList.next(records);
   }
 
-  constructor(private keyCloakSvc: KeycloakService) {
-    this.keyCloakSvc.loadUserProfile().then((obs: IUser) => (this.user = obs));
+  constructor(private oidcSecurityService: OidcSecurityService) {
+    this.oidcSecurityService
+      .getUserData().toPromise()
+      .then((obs: IUser) => (this.user = obs));
   }
 }

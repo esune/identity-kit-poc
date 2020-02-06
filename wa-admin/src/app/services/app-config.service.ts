@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { OpenIdConfiguration } from 'angular-auth-oidc-client';
 
 export interface IAppConfig {
   env: {
@@ -18,11 +19,7 @@ export interface IAppConfig {
     url: string;
   };
 
-  keycloak: {
-    url: string;
-    realm: string;
-    clientId: string;
-  };
+  oidc: OpenIdConfiguration;
 }
 
 @Injectable({

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { KeycloakService } from 'keycloak-angular';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { take } from 'rxjs/operators';
 import { ActionType } from '../shared/interfaces/actions.interface';
 import { IInvitationRecord } from '../shared/interfaces/invitation-record.interface';
@@ -20,7 +20,7 @@ export class ActionService {
   constructor(
     private httpSvc: HttpService,
     private stateSvc: StateService,
-    private keyCloakSvc: KeycloakService,
+    private oidcSecurityService: OidcSecurityService,
     private http: HttpClient
   ) {
     this.apiUrl = apiUrl;
@@ -127,6 +127,6 @@ export class ActionService {
     this.loadData();
   }
   logout() {
-    this.keyCloakSvc.logout();
+    this.oidcSecurityService.logoff();
   }
 }

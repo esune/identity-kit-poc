@@ -25,10 +25,9 @@
     "@bcgov/bc-sans": "^1.0.1",
     "@capacitor/core": "1.3.0",
     "@ionic/angular": "^4.11.4",
+    "angular-auth-oidc-client": "^10.0.14",
     "color": "^3.1.2",
     "hammerjs": "^2.0.8",
-    "keycloak-angular": "^7.0.1",
-    "keycloak-js": "^7.0.1",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"

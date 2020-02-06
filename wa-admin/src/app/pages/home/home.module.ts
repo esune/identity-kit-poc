@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthorizationGuard } from 'src/app/guards/authorization.guard';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddUserPreviewComponent } from './components/add-user-preview/add-user-preview.component';
 import { AddUserComponent } from './components/add-user/add-user.component';
@@ -23,6 +24,7 @@ import { HomePage } from './home.page';
     SuccessComponent,
     ViewComponent,
     AddUserPreviewComponent
-  ]
+  ],
+  providers: [AuthorizationGuard]
 })
 export class HomePageModule {}

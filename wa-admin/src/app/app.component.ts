@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ThemeService } from './services/theme.service';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 const themes = {
   autumn: {
@@ -35,17 +36,56 @@ const themes = {
   `,
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  title = 'wa-admin';
-  constructor(private theme: ThemeService) {
-    // this.changeTheme('neon');
+export class AppComponent implements OnInit, OnDestroy {
+  isAuthenticated: boolean;
+  userData: any;
+
+  constructor(public oidcSecurityService: OidcSecurityService) {
+    if (this.oidcSecurityService.moduleSetup) {
+      this.doCallbackLogicIfRequired();
+    } else {
+      this.oidcSecurityService.onModuleSetup.subscribe(() => {
+        this.doCallbackLogicIfRequired();
+      });
+    }
   }
 
-  changeTheme(name) {
-    this.theme.setTheme(themes[name]);
+  ngOnInit() {
+    this.oidcSecurityService.getIsAuthorized().subscribe(auth => {
+      this.isAuthenticated = auth;
+    });
+
+    this.oidcSecurityService.getUserData().subscribe(userData => {
+      this.userData = userData;
+    });
   }
 
-  changeSpeed(val) {
-    this.theme.setVariable('--speed', `${val}ms`);
+  ngOnDestroy(): void {}
+
+  login() {
+    this.oidcSecurityService.authorize();
   }
+
+  logout() {
+    this.oidcSecurityService.logoff();
+  }
+
+  private doCallbackLogicIfRequired() {
+    // Will do a callback, if the url has a code and state parameter.
+    this.oidcSecurityService.authorizedCallbackWithCode(
+      window.location.toString()
+    );
+  }
+
+  // constructor(private theme: ThemeService) {
+  //   // this.changeTheme('neon');
+  // }
+
+  // changeTheme(name) {
+  //   this.theme.setTheme(themes[name]);
+  // }
+
+  // changeSpeed(val) {
+  //   this.theme.setVariable('--speed', `${val}ms`);
+  // }
 }
