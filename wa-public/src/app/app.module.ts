@@ -17,7 +17,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IonicModule } from '@ionic/angular';
-import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+import {
+  AuthModule,
+  ConfigResult,
+  OidcConfigService,
+  OidcSecurityService,
+} from 'angular-auth-oidc-client';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AcceptDisclaimerComponent } from './components/accept-disclaimer/accept-disclaimer.component';
@@ -28,6 +33,7 @@ import { InputComponent } from './components/input/input.component';
 import { IssuePreviewComponent } from './components/issue-preview/issue-preview.component';
 import { RequestTokenComponent } from './components/request-token/request-token.component';
 import { ViewWrapperComponent } from './components/view-wrapper/view-wrapper.component';
+import { AuthorizationGuard } from './guards/authorization.guard';
 import { HomeComponent } from './home/home.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { CompletedComponent } from './pages/completed/completed.component';
@@ -35,16 +41,23 @@ import { SuccessComponent } from './pages/success/success.component';
 import { TrackComponent } from './pages/track/track.component';
 import { AppConfigService } from './services/app-config.service';
 import { FormConfigService } from './services/form-config.service';
-
-const keycloakService = new KeycloakService();
+import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
+import { AutoLoginComponent } from './components/auto-login/auto-login.component';
 
 export function initializeApp(
+  oidcConfigService: OidcConfigService,
   appConfigService: AppConfigService,
   formConfigService: FormConfigService,
 ) {
+  console.log('Executing APP_INITIALIZER...');
   return () =>
-    appConfigService.load().then(success => {
-      return formConfigService.load();
+    appConfigService.load().then(() => {
+      Promise.all([
+        oidcConfigService.load_using_stsServer(
+          AppConfigService.settings.oidc.stsServer,
+        ),
+        formConfigService.load(),
+      ]);
     });
 }
 
@@ -81,59 +94,45 @@ const components = [
 ];
 
 @NgModule({
-  declarations: [[...components], AppComponent],
+  declarations: [[...components], AppComponent, UnauthorizedComponent, AutoLoginComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    KeycloakAngularModule,
     MatNativeDateModule,
     [...matModules],
     IonicModule.forRoot(),
+    AuthModule.forRoot(),
   ],
   providers: [
-    {
-      provide: KeycloakService,
-      useValue: keycloakService,
-    },
     AppConfigService,
     FormConfigService,
+    OidcSecurityService,
+    OidcConfigService,
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
-      deps: [AppConfigService, FormConfigService],
+      deps: [OidcConfigService, AppConfigService, FormConfigService],
       multi: true,
     },
+    AuthorizationGuard,
   ],
-  entryComponents: [AppComponent],
+  bootstrap: [AppComponent],
 })
 export class AppModule {
-  ngDoBootstrap(app) {
-    keycloakService
-      .init({
-        config: {
-          url: AppConfigService.settings.keycloak.url,
-          realm: AppConfigService.settings.keycloak.realm,
-          clientId: AppConfigService.settings.keycloak.clientId,
-        },
-        initOptions: {
-          onLoad: 'check-sso',
-          checkLoginIframe: false,
-        },
-        bearerExcludedUrls: [
-          '/assets',
-          '/validate',
-          '/completed',
-          'https://ws1.postescanada-canadapost.ca/AddressComplete/Interactive/AutoComplete/v1.00/json3.ws',
-        ],
-      })
-      .then(() => {
-        console.log('[ngDoBootstrap] bootstrap app');
-        app.bootstrap(AppComponent);
-      })
-      .catch(error =>
-        console.error('[ngDoBootstrap] init Keycloak failed', error),
-      );
+  constructor(
+    private oidcSecurityService: OidcSecurityService,
+    private oidcConfigService: OidcConfigService,
+  ) {
+    this.oidcConfigService.onConfigurationLoaded.subscribe(
+      (configResult: ConfigResult) => {
+        this.oidcSecurityService.setupModule(
+          AppConfigService.settings.oidc,
+          configResult.authWellknownEndpoints,
+        );
+      },
+    );
+    console.log('Starting app...');
   }
 }

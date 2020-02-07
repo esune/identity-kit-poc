@@ -3,9 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppConfigService } from './app-config.service';
 
-export interface IUser extends Keycloak.KeycloakProfile {
+export interface IUser {
   _id?: string;
   guid?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
 export interface IValidateLink {
@@ -38,7 +41,7 @@ export class StateService {
     return localStorage.getItem('email') || '';
   }
 
-  user: IUser = {};
+  user: IUser;
   private _apiUrl: string;
 
   isValidToken(token: string): Observable<IValidateLink> {

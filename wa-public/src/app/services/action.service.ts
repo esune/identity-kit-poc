@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { KeycloakService } from 'keycloak-angular';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { IInvitationRecord } from '../interfaces/invitation-record';
 import { AppConfigService } from './app-config.service';
 import { StateService } from './state.service';
+import { ConfigurationProvider } from 'angular-auth-oidc-client/lib/services/auth-configuration.provider';
+import { Router } from '@angular/router';
 
 export interface IInvitation {
   connection_id: string;
@@ -96,27 +98,29 @@ export interface KeyCorrectnessProof {
 })
 export class ActionService {
   _apiUrl: string;
-  authenticate() {
-    // TODO: @ES some authentication logic here
-  }
 
   set email(addr: string) {
     localStorage.setItem('email', addr);
   }
 
   constructor(
-    private keyCloakSvc: KeycloakService,
+    private oidcSecurityService: OidcSecurityService,
+    private router: Router,
     private stateSvc: StateService,
     private http: HttpClient,
   ) {
     this._apiUrl = AppConfigService.settings.apiServer.url;
-    this.keyCloakSvc
-      .loadUserProfile()
-      .then((res: Keycloak.KeycloakProfile) => (this.stateSvc.user = res));
+    this.oidcSecurityService.getUserData().subscribe((userData: any) => {
+      this.stateSvc.user = userData;
+    });
   }
 
-  async logout(uri?: string) {
-    return this.keyCloakSvc.logout(uri || '');
+  async logout(url?: string) {
+    return this.oidcSecurityService.logoff(() => {
+      if (url) {
+        this.router.navigateByUrl(url);
+      }
+    });
   }
 
   getInvitation() {

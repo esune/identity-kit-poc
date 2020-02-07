@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 @Component({
-  selector: 'waa-auto-login',
+  selector: 'wap-auto-login',
   template: `
     <div>
       Redirecting to Identity Provider login...
     </div>
   `,
-  styleUrls: ['./auto-login.component.scss']
+  styleUrls: ['./auto-login.component.scss'],
 })
 export class AutoLoginComponent implements OnInit {
 

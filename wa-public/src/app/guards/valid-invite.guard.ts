@@ -34,12 +34,23 @@ export class ValidInviteGuard implements CanActivate {
     return this.stateService.isValidToken(inviteToken).pipe(
       tap(obs => (this.actionSvc.email = obs.email || '')),
       map(obs => {
-        console.log(obs);
-        if (!obs) return false;
-        if (!obs.active) return this.router.createUrlTree(['/']);
+        console.log('Observable:', obs);
+        if (!obs) {
+          // no token/invalid token
+          return false;
+        }
+        if (!obs.active) {
+          // token was already used
+          console.log('Navigating to /');
+          return this.router.createUrlTree(['/']);
+        }
         if (obs.active && obs.expired) {
+          // token expired
+          console.log(`Navigating to request/${inviteToken}`);
           return this.router.createUrlTree([`request/${inviteToken}`]);
         }
+        // valid active token
+        console.log(`Navigating to accept/${inviteToken}`);
         return this.router.createUrlTree([`accept/${inviteToken}`]);
       }),
     );
