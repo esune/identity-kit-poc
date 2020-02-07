@@ -31,27 +31,31 @@ export class ValidInviteGuard implements CanActivate {
     | UrlTree {
     const inviteToken = route.queryParamMap.get('invite_token');
 
+    if (this.stateService.inviteToken) {
+      // token was previously validated and was already stored in the state
+      console.log('Token is in state, proceeding');
+      return true;
+    }
+
+    // check token validity and act accordingly
     return this.stateService.isValidToken(inviteToken).pipe(
-      tap(obs => (this.actionSvc.email = obs.email || '')),
+      tap(obs => (this.actionSvc.email = obs.email)),
       map(obs => {
-        console.log('Observable:', obs);
-        if (!obs) {
-          // no token/invalid token
-          return false;
+        if (!obs || !obs.active) {
+          // no token/invalid token/used token
+          return this.router.createUrlTree(['unauthorized']);
         }
-        if (!obs.active) {
-          // token was already used
-          console.log('Navigating to /');
-          return this.router.createUrlTree(['/']);
-        }
+
+        // token is valid, store in state
+        this.stateService.inviteToken = inviteToken;
+
         if (obs.active && obs.expired) {
           // token expired
-          console.log(`Navigating to request/${inviteToken}`);
-          return this.router.createUrlTree([`request/${inviteToken}`]);
+          return this.router.createUrlTree([`request`]);
         }
+
         // valid active token
-        console.log(`Navigating to accept/${inviteToken}`);
-        return this.router.createUrlTree([`accept/${inviteToken}`]);
+        return this.router.createUrlTree([`accept`]);
       }),
     );
   }

@@ -37,6 +37,6 @@ export class TrackComponent implements OnInit {
     this.$id.next(credExId);
   }
   async logout() {
-    await this.actionSvc.logout()
+    await this.actionSvc.logout();
   }
 }

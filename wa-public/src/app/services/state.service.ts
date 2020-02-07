@@ -22,43 +22,27 @@ export interface IValidateLink {
   providedIn: 'root',
 })
 export class StateService {
-  private _isAuth = false;
-  private _title = 'Identity Kit POC';
+  private apiURL: string;
+  user: IUser;
 
-  get linkId() {
-    return localStorage.getItem('linkId');
+  constructor(private http: HttpClient) {
+    this.apiURL = AppConfigService.settings.apiServer.url;
   }
 
-  get _id() {
-    return localStorage.getItem('id');
+  get inviteToken() {
+    return localStorage.getItem('inviteToken');
   }
 
-  set _id(id: string) {
-    localStorage.setItem('id', id);
+  set inviteToken(id: string) {
+    localStorage.setItem('inviteToken', id);
   }
 
   get email(): string {
-    return localStorage.getItem('email') || '';
+    return localStorage.getItem('email');
   }
-
-  user: IUser;
-  private _apiUrl: string;
 
   isValidToken(token: string): Observable<IValidateLink> {
-    const url = `${this._apiUrl}/invitations/${token}/validate`;
-    localStorage.setItem('linkId', token);
+    const url = `${this.apiURL}/invitations/${token}/validate`;
     return this.http.get<IValidateLink>(url);
-  }
-
-  get isAuth() {
-    return this._isAuth;
-  }
-
-  get title() {
-    return this._title;
-  }
-
-  constructor(private http: HttpClient) {
-    this._apiUrl = AppConfigService.settings.apiServer.url;
   }
 }

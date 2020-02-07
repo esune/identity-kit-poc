@@ -19,7 +19,7 @@
     "silent_renew": true,
     "silent_renew_url": "http://localhost:8082/assets/silent-renew.html",
     "silent_renew_offset_in_seconds": 200,
-    "post_login_route": "/home",
+    "post_login_route": "/accept",
     "forbidden_route": "/forbidden",
     "unauthorized_route": "/unauthorized",
     "log_console_warning_active": false,

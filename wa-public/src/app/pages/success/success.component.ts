@@ -379,7 +379,7 @@ export class SuccessComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    if (!this.stateSvc._id) return (this.hasId = false);
+    if (!this.stateSvc.inviteToken) return (this.hasId = false);
     let user = this.stateSvc.user;
     const keys = Object.keys(user);
     this.disableList = keys.filter(key => user[key] !== undefined || null || '');
@@ -484,7 +484,7 @@ export class SuccessComponent implements OnInit, OnDestroy {
     return map;
   }
   connect() {
-    if (!this.stateSvc._id) return (this.hasId = false);
+    if (!this.stateSvc.inviteToken) return (this.hasId = false);
     const form = this.fg.getRawValue();
     const timer = interval(6000);
     this.subs.push(
@@ -513,7 +513,7 @@ export class SuccessComponent implements OnInit, OnDestroy {
                   postalcode: form.postalCode,
                   country: 'CA',
                 },
-                _id: this.stateSvc._id,
+                _id: this.stateSvc.inviteToken,
               })
               .toPromise()
               .then(res => this.router.navigate([`/issue-credential/${res.credential_exchange_id}`]));

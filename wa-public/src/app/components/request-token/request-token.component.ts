@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormControl, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import { ActionService } from 'src/app/services/action.service';
 import { StateService } from 'src/app/services/state.service';
-import { FormControl, Validators } from '@angular/forms';
-import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'wap-request-token',
@@ -16,12 +16,19 @@ import { LoadingController } from '@ionic/angular';
     <wap-view-wrapper>
       <mat-card>
         <mat-card-header class="main-header" *ngIf="!sent; else isSent">
-          <img mat-card-avatar src="assets/VON-Logo.png" alt="VON Network logo" class="header-image" />
+          <img
+            mat-card-avatar
+            src="assets/VON-Logo.png"
+            alt="VON Network logo"
+            class="header-image"
+          />
           <mat-card-title>Request Token</mat-card-title>
           <mat-card-subtitle
-            >Your token has expired. To continue using the Identity Kit Proof of Concept(POC) please request a new token
-            below. We've entered the email address that was originally signed up for the POC. If you'd like to use a
-            different address to receive your new invite please enter it here.</mat-card-subtitle
+            >Your token has expired. To continue using the Identity Kit Proof of
+            Concept(POC) please request a new token below. We've entered the
+            email address that was originally signed up for the POC. If you'd
+            like to use a different address to receive your new invite please
+            enter it here.</mat-card-subtitle
           >
         </mat-card-header>
 
@@ -38,7 +45,12 @@ import { LoadingController } from '@ionic/angular';
           <button mat-raised-button (click)="decline()" color="warn">
             No Thanks
           </button>
-          <button mat-raised-button (click)="submit(fc)" [disabled]="fc.invalid" color="primary">
+          <button
+            mat-raised-button
+            (click)="submit(fc)"
+            [disabled]="fc.invalid"
+            color="primary"
+          >
             Request
           </button>
         </mat-card-actions>
@@ -46,10 +58,16 @@ import { LoadingController } from '@ionic/angular';
     </wap-view-wrapper>
     <ng-template #isSent>
       <mat-card-header class="main-header">
-        <img mat-card-avatar src="assets/VON-Logo.png" alt="VON Network logo" class="header-image" />
+        <img
+          mat-card-avatar
+          src="assets/VON-Logo.png"
+          alt="VON Network logo"
+          class="header-image"
+        />
         <mat-card-title>Request sent</mat-card-title>
         <mat-card-subtitle
-          >We have submitted your request for a new token. Please check your email for a new token.</mat-card-subtitle
+          >We have submitted your request for a new token. Please check your
+          email for a new token.</mat-card-subtitle
         >
       </mat-card-header>
     </ng-template>
@@ -74,13 +92,17 @@ export class RequestTokenComponent implements OnInit {
   ngOnInit() {}
 
   async submit(fc: FormControl) {
-    console.log('submit clicked');
     const email = fc.value;
-    const id = this.route.snapshot.paramMap.get('id');
-    const load = await this.loadingCtrl.create({ message: 'Sending request', duration: 10000 });
+    const inviteToken = this.stateSvc.inviteToken;
+    const load = await this.loadingCtrl.create({
+      message: 'Sending request',
+      duration: 10000,
+    });
     await load.present();
     try {
-      const res = await this.actionSvc.requestRenewal({ email, id }).toPromise();
+      await this.actionSvc
+        .requestRenewal({ email, id: inviteToken })
+        .toPromise();
 
       await load.dismiss();
       this.sent = true;
@@ -91,7 +113,6 @@ export class RequestTokenComponent implements OnInit {
   }
 
   decline() {
-    console.log('decline clicked');
     this.router.navigate(['']);
   }
 }
