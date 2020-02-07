@@ -1,6 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ThemeService } from './services/theme.service';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { Router } from '@angular/router';
+import {
+  AuthorizationResult,
+  AuthorizationState,
+  OidcSecurityService
+} from 'angular-auth-oidc-client';
 
 const themes = {
   autumn: {
@@ -31,7 +35,6 @@ const themes = {
 @Component({
   selector: 'waa-root',
   template: `
-    <!--The content below is only a placeholder and can be replaced.-->
     <router-outlet></router-outlet>
   `,
   styleUrls: ['./app.component.scss']
@@ -40,14 +43,23 @@ export class AppComponent implements OnInit, OnDestroy {
   isAuthenticated: boolean;
   userData: any;
 
-  constructor(public oidcSecurityService: OidcSecurityService) {
+  constructor(
+    public oidcSecurityService: OidcSecurityService,
+    private router: Router
+  ) {
     if (this.oidcSecurityService.moduleSetup) {
-      this.doCallbackLogicIfRequired();
+      this.onOidcModuleSetup();
     } else {
       this.oidcSecurityService.onModuleSetup.subscribe(() => {
-        this.doCallbackLogicIfRequired();
+        this.onOidcModuleSetup();
       });
     }
+
+    this.oidcSecurityService.onAuthorizationResult.subscribe(
+      (authorizationResult: AuthorizationResult) => {
+        this.onAuthorizationResultComplete(authorizationResult);
+      }
+    );
   }
 
   ngOnInit() {
@@ -62,30 +74,56 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {}
 
-  login() {
-    this.oidcSecurityService.authorize();
+  private onOidcModuleSetup() {
+    if (window.location.toString().match('state')) {
+      this.oidcSecurityService.authorizedCallbackWithCode(
+        window.location.toString()
+      );
+    } else {
+      if ('/autologin' !== window.location.pathname) {
+        this.write('redirect', window.location.pathname);
+      }
+      console.log('AppComponent:onModuleSetup');
+      this.oidcSecurityService
+        .getIsAuthorized()
+        .subscribe((authorized: boolean) => {
+          if (!authorized) {
+            this.router.navigate(['/autologin']);
+          }
+        });
+    }
   }
 
-  logout() {
-    this.oidcSecurityService.logoff();
-  }
-
-  private doCallbackLogicIfRequired() {
-    // Will do a callback, if the url has a code and state parameter.
-    this.oidcSecurityService.authorizedCallbackWithCode(
-      window.location.toString()
+  private onAuthorizationResultComplete(
+    authorizationResult: AuthorizationResult
+  ) {
+    const path = this.read('redirect');
+    console.log(
+      'Auth result received AuthorizationState:' +
+        authorizationResult.authorizationState +
+        ' validationResult:' +
+        authorizationResult.validationResult
     );
+
+    if (
+      authorizationResult.authorizationState === AuthorizationState.authorized
+    ) {
+      this.router.navigate([path]);
+    } else {
+      this.router.navigate(['/unauthorized']);
+    }
   }
 
-  // constructor(private theme: ThemeService) {
-  //   // this.changeTheme('neon');
-  // }
+  private read(key: string): any {
+    const data = localStorage.getItem(key);
+    if (data != null) {
+      return JSON.parse(data);
+    }
 
-  // changeTheme(name) {
-  //   this.theme.setTheme(themes[name]);
-  // }
+    return;
+  }
 
-  // changeSpeed(val) {
-  //   this.theme.setVariable('--speed', `${val}ms`);
-  // }
+  private write(key: string, value: any): void {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
 }

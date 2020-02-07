@@ -9,7 +9,7 @@ export interface IUser {
   username: string;
   email: string;
   emailVerified: boolean;
-  firstname: string;
+  firstName: string;
   lastName: string;
 }
 
@@ -19,7 +19,6 @@ export interface IUser {
 export class StateService {
   private $$userList = new BehaviorSubject<IInvitationRecord[]>(null);
 
-  private _isAuthenticated = false;
   private _changeRecords = new Set<string>();
 
   private _state: StateType = 'invited';
@@ -50,21 +49,13 @@ export class StateService {
     return this.$$userList.getValue();
   }
 
-  set isAuthenticated(bool) {
-    this._isAuthenticated = bool;
-  }
-
-  get isAuthenticated() {
-    return this._isAuthenticated;
-  }
-
   setUserList(records: IInvitationRecord[]) {
     this.$$userList.next(records);
   }
 
   constructor(private oidcSecurityService: OidcSecurityService) {
-    this.oidcSecurityService
-      .getUserData().toPromise()
-      .then((obs: IUser) => (this.user = obs));
+    this.oidcSecurityService.getUserData().subscribe((userData: any) => {
+      this.user = userData;
+    });
   }
 }

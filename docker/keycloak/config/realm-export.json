@@ -611,6 +611,23 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+          {
+              "name": "client roles",
+              "protocol": "openid-connect",
+              "protocolMapper": "oidc-usermodel-client-role-mapper",
+              "consentRequired": false,
+              "config": {
+                  "multivalued": "true",
+                  "user.attribute": "foo",
+                  "id.token.claim": "true",
+                  "access.token.claim": "true",
+                  "claim.name": "resource_access.${client_id}.roles",
+                  "jsonType.label": "String",
+                  "usermodel.clientRoleMapping.clientId": "identity-kit-admin"
+              }
+          }
+      ],
       "defaultClientScopes": [
         "web-origins",
         "role_list",

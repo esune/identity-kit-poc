@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthorizationGuard } from 'src/app/guards/authorization.guard';
 import { AppConfigService } from 'src/app/services/app-config.service';
 import { AddUserComponent } from './components/add-user/add-user.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
@@ -18,31 +17,23 @@ if (AppConfigService.settings.userList.enabled) {
   console.log('User management module is ENABLED');
   routes.push(
     {
-      path: 'home',
-      component: HomePage,
-      canActivate: [AuthorizationGuard],
-      data: { roles: ['wa-admin'] }
+      path: '',
+      component: HomePage
     },
     {
       path: 'manage',
-      component: ManageUsersComponent,
-      canActivate: [AuthorizationGuard],
-      data: { roles: ['wa-admin'] }
+      component: ManageUsersComponent
     },
     {
       path: 'view/:id',
-      component: ViewComponent,
-      canActivate: [AuthorizationGuard],
-      data: { roles: ['wa-admin'] }
+      component: ViewComponent
     }
   );
 } else {
   console.log('User management module is DISABLED');
   routes.push({
-    path: 'home',
-    component: AddUserComponent,
-    canActivate: [AuthorizationGuard],
-    data: { roles: ['wa-admin'] }
+    path: '',
+    component: AddUserComponent
   });
 }
 

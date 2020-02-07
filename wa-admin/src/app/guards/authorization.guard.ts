@@ -8,8 +8,9 @@ import {
   RouterStateSnapshot
 } from '@angular/router';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, combineLatest } from 'rxjs';
+import { map, combineAll } from 'rxjs/operators';
+import { AppConfigService } from '../services/app-config.service';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate, CanLoad {
@@ -22,11 +23,25 @@ export class AuthorizationGuard implements CanActivate, CanLoad {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> {
-    return this.checkUser();
+    return combineLatest(
+      this.checkUser(),
+      this.checkUserRoles(route.data.roles)
+    ).pipe(
+      map(([res1, res2]) => {
+        return res1 && res2;
+      })
+    );
   }
 
-  canLoad(state: Route): Observable<boolean> {
-    return this.checkUser();
+  canLoad(route: Route): Observable<boolean> {
+    return combineLatest(
+      this.checkUser(),
+      this.checkUserRoles(route.data.roles)
+    ).pipe(
+      map(([res1, res2]) => {
+        return res1 && res2;
+      })
+    );
   }
 
   private checkUser(): Observable<boolean> {
@@ -39,5 +54,26 @@ export class AuthorizationGuard implements CanActivate, CanLoad {
         return true;
       })
     );
+  }
+
+  private checkUserRoles(requiredRoles: string[]): Observable<boolean> {
+    const idTokenPayload = this.oidcSecurityService.getPayloadFromIdToken();
+    let clientRoles: string[];
+    try {
+      clientRoles =
+        idTokenPayload.resource_access[AppConfigService.settings.oidc.client_id]
+          .roles;
+    } catch (err) {
+      // No resource_access object for this user on this client id
+    }
+
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return of(true);
+    } else {
+      if (!clientRoles || clientRoles.length === 0) {
+        return of(false);
+      }
+      return of(requiredRoles.every(role => clientRoles.indexOf(role) > -1));
+    }
   }
 }

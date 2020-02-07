@@ -5,18 +5,19 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IonicModule } from '@ionic/angular';
 import {
   AuthModule,
-  OidcConfigService,
-  OidcSecurityService,
   ConfigResult,
-  OpenIdConfiguration
+  OidcConfigService,
+  OidcSecurityService
 } from 'angular-auth-oidc-client';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AutoLoginComponent } from './components/auto-login/auto-login.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { AuthorizationGuard } from './guards/authorization.guard';
 import { AppConfigService } from './services/app-config.service';
 import { FormConfigService } from './services/form-config.service';
 import { SharedModule } from './shared/shared.module';
-import { AutoLoginComponent } from './components/auto-login/auto-login.component';
+import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 
 export function initializeApp(
   oidcConfigService: OidcConfigService,
@@ -36,7 +37,7 @@ export function initializeApp(
 }
 
 @NgModule({
-  declarations: [AppComponent, NotFoundComponent, AutoLoginComponent],
+  declarations: [AppComponent, NotFoundComponent, AutoLoginComponent, UnauthorizedComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -56,7 +57,8 @@ export function initializeApp(
       useFactory: initializeApp,
       deps: [OidcConfigService, AppConfigService, FormConfigService],
       multi: true
-    }
+    },
+    AuthorizationGuard
   ],
   bootstrap: [AppComponent]
 })
