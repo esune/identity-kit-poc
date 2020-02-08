@@ -67,7 +67,7 @@ export class AcceptDisclaimerComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    if (!this.stateSvc.inviteToken) {
+    if (!this.stateSvc.getInviteToken()) {
       this.router.navigate(['/unauthorized']);
     }
   }

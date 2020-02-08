@@ -23,18 +23,19 @@ export interface IValidateLink {
 })
 export class StateService {
   private apiURL: string;
+  private inviteToken: string;
   user: IUser;
 
   constructor(private http: HttpClient) {
     this.apiURL = AppConfigService.settings.apiServer.url;
   }
 
-  get inviteToken() {
-    return localStorage.getItem('inviteToken');
+  getInviteToken() {
+    return this.inviteToken;
   }
 
-  set inviteToken(id: string) {
-    localStorage.setItem('inviteToken', id);
+  setInviteToken(token: string) {
+    this.inviteToken = token;
   }
 
   get email(): string {

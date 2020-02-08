@@ -31,9 +31,9 @@ export class ValidInviteGuard implements CanActivate {
     | UrlTree {
     const inviteToken = route.queryParamMap.get('invite_token');
 
-    if (this.stateService.inviteToken) {
+    if (this.stateService.getInviteToken()) {
       // token was previously validated and was already stored in the state
-      console.log('Token is in state, proceeding');
+      console.log('Token is in state, proceeding', this.stateService.getInviteToken());
       return true;
     }
 
@@ -47,7 +47,7 @@ export class ValidInviteGuard implements CanActivate {
         }
 
         // token is valid, store in state
-        this.stateService.inviteToken = inviteToken;
+        this.stateService.setInviteToken(inviteToken);
 
         if (obs.active && obs.expired) {
           // token expired

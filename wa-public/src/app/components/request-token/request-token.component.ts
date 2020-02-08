@@ -93,7 +93,7 @@ export class RequestTokenComponent implements OnInit {
 
   async submit(fc: FormControl) {
     const email = fc.value;
-    const inviteToken = this.stateSvc.inviteToken;
+    const inviteToken = this.stateSvc.getInviteToken();
     const load = await this.loadingCtrl.create({
       message: 'Sending request',
       duration: 10000,

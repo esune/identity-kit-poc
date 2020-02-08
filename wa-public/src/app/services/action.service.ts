@@ -116,11 +116,10 @@ export class ActionService {
   }
 
   async logout(url?: string) {
-    return this.oidcSecurityService.logoff(() => {
-      if (url) {
-        this.router.navigateByUrl(url);
-      }
-    });
+    await this.oidcSecurityService.logoff();
+    if (url) {
+      return this.router.navigateByUrl(url);
+    }
   }
 
   getInvitation() {

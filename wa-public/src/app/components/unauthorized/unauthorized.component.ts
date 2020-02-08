@@ -10,7 +10,5 @@ import { Component, OnInit } from '@angular/core';
 export class UnauthorizedComponent implements OnInit {
   constructor() {}
 
-  ngOnInit() {
-    console.log('in unauthorized component');
-  }
+  ngOnInit() {}
 }
