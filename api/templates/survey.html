@@ -1,0 +1,62 @@
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://surveyjs.azureedge.net/1.5.17/survey.vue.js"></script>
+<link
+  href="https://surveyjs.azureedge.net/1.5.17/survey.css"
+  type="text/css"
+  rel="stylesheet"
+/>
+<style>
+  .sv_nav input.sv_complete_btn {
+    /* Hide SurveyJS complete button */
+    display: none;
+  }
+</style>
+
+{{ context.inputHTML }}
+
+<div id="surveyElement" style="display:inline-block;width:100%;">
+  <survey :survey="survey" />
+</div>
+
+<script type="text/javascript">
+  Survey.StylesManager.applyTheme("default");
+
+  var json = JSON.parse('{{ context.survey_config | safe }}');
+
+  window.survey = new Survey.Model(json);
+
+  survey.completedHtml = "<span></span>";
+  const fieldSelector = "{{context.field_id}}";
+  const surveyField = document.querySelector(`#${fieldSelector}`);
+
+  // Store updated survey values in form field
+  survey.onValueChanged.add(function(sender, options) {
+    surveyField.value = JSON.stringify(survey.data, null, 3);
+  });
+
+  // Create new widget instance
+  var app = new Vue({
+    el: "#surveyElement",
+    data: {
+      survey: survey
+    },
+    created: function() {
+      function setField(key, value) {
+        try {
+          survey.getQuestionByName(key).setPropertyValue("value", value);
+          survey.setValue(key, value);
+        } catch (e) {
+          console.warn(
+            `The provided key '${key}' is not a valid field and was skipped.`
+          );
+        }
+      }
+
+      let surveyData = surveyField.value;
+      surveyData = surveyData ? JSON.parse(surveyData) : {};
+      Object.keys(surveyData).forEach(key => {
+        setField(key, surveyData[key]);
+      });
+    }
+  });
+</script>

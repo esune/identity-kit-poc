@@ -24,3 +24,7 @@
 # Keycloak
 **/hsperfdata_jboss
 **/realm-export-docker.json
+
+# Pythonn
+Pipfile*
+**/__pycache__
