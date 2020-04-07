@@ -152,7 +152,7 @@ EOF
 # -----------------------------------------------------------------------------------------------------------------
 DEFAULT_CONTAINERS="db agent wallet keycloak keycloak-db"
 PROD_CONTAINERS="issuer-web"
-DEV_CONTAINERS="issuer-web-dev"
+DEV_CONTAINERS="issuer-web-dev api-dev"
 # -----------------------------------------------------------------------------------------------------------------
 # Functions:
 # -----------------------------------------------------------------------------------------------------------------
@@ -160,7 +160,14 @@ build-issuer-web() {
   echo -e "\nBuilding issuer-web image..."
   docker build \
     -t 'issuer-web' \
-    -f '../docker/issuer-web/Dockerfile.dockerprod' '../'
+    -f '../docker/issuer-web/Dockerfile.prod' '../'
+}
+
+build-api-dev() {
+  echo -e "\nBuilding issuer-api-dev image..."
+  docker build \
+    -t 'issuer-api-dev' \
+    -f '../docker/api/Dockerfile.dev' '../'
 }
 
 build-all() {
@@ -201,6 +208,12 @@ configureEnvironment() {
   export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-issuer-kit}"
   export S2I_SCRIPTS_PATH=${S2I_SCRIPTS_PATH:-/usr/libexec/s2i}
   export DEBUG=${DEBUG}
+
+  # api
+  export FLASK_APP=api.py
+  export FLASK_ENV=development
+  export FLASK_RUN_PORT=5000
+  export FLASK_RUN_HOST=0.0.0.0
 
   # issuer-web
   export ISSUER_WEB_PORT=4251
@@ -391,6 +404,9 @@ case "${COMMAND}" in
     docker-compose logs -f
     ;;
   start-dev)
+    isS2iInstalled
+    build-api-dev
+    
     unset BCOVRIN_SCHEMA_ID
     unset LEDGER_URL
     unset NGROK_AGENT_ENDPOINT

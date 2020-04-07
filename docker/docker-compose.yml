@@ -1,6 +1,23 @@
 version: "3"
 services:
   #
+  # API with hot-reloading
+  #
+  api-dev:
+    image: issuer-api-dev:latest
+    environment:
+      - FLASK_APP=api.py
+      - FLASK_ENV=development
+      - FLASK_RUN_PORT=5000
+      - FLASK_RUN_HOST=0.0.0.0
+    volumes:
+      - ../api:/app
+    ports:
+      - ${FLASK_RUN_PORT}:${FLASK_RUN_PORT}
+    networks:
+      - issuer_kit
+  
+  #
   # Issuer frontend
   #
   issuer-web:
@@ -20,10 +37,10 @@ services:
     ports:
       - ${PUBLIC_WEB_HOST_PORT}:${PUBLIC_WEB_HOST_PORT}
     networks:
-      - identity_kit
+      - issuer_kit
 
   #
-  # Issuer frontend
+  # Issuer frontend with hot reloading
   #
   issuer-web-dev:
     image: node:erbium
@@ -33,7 +50,7 @@ services:
     ports:
       - ${ISSUER_WEB_PORT}:${ISSUER_WEB_PORT}
     networks:
-      - identity_kit
+      - issuer_kit
     command: npm run serve
 
   #
@@ -51,7 +68,7 @@ services:
     ports:
       - ${MONGODB_PORT}:${MONGODB_PORT}
     networks:
-      - identity_kit
+      - issuer_kit
 
   #
   # keycloak service
@@ -109,7 +126,7 @@ services:
       - AGENT_NAME=${AGENT_NAME}
       - AGENT_ADMIN_API_KEY=${AGENT_ADMIN_API_KEY}
     networks:
-      - identity_kit
+      - issuer_kit
     ports:
       - ${AGENT_HTTP_INTERFACE_PORT}:${AGENT_HTTP_INTERFACE_PORT}
       - ${AGENT_ADMIN_PORT}:${AGENT_ADMIN_PORT}
@@ -155,14 +172,14 @@ services:
       - POSTGRESQL_DATABASE=${WALLET_DATABASE}
       - POSTGRESQL_ADMIN_PASSWORD=${WALLET_ADMIN_PASSWORD}
     networks:
-      - identity_kit
+      - issuer_kit
     ports:
       - ${WALLET_PORT}:${WALLET_PORT}
     volumes:
       - wallet-data:/var/lib/pgsql/data
 
 networks:
-  identity_kit:
+  issuer_kit:
 
 volumes:
   keycloak-db-data:
