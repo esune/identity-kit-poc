@@ -1,14 +1,13 @@
 import datetime
 import json
 
-from flask import redirect, url_for
+from flask_admin import BaseView
 from flask_admin.contrib.mongoengine import ModelView
 
-from flask_oidc_ex import OpenIDConnect
 from widgets.surveyjs import SurveyJSField
 
 
-class IssuerInviteView(ModelView):
+class IssuerInviteView(ModelView, BaseView):
     column_list = ("email", "issued", "expired")
     form_widget_args = {
         "token": {"disabled": True},
@@ -30,9 +29,3 @@ class IssuerInviteView(ModelView):
 
         # deserialize data object and store it
         model.data = json.loads(model.data)
-
-    def is_accessible(self):
-        return OpenIDConnect.user_loggedin
-
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for("/"))

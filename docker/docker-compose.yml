@@ -6,6 +6,7 @@ services:
   api-dev:
     image: issuer-api-dev:latest
     environment:
+      - DEBUG=true
       - FLASK_APP=${FLASK_APP}
       - FLASK_ENV=development
       - FLASK_RUN_PORT=${FLASK_RUN_PORT}
