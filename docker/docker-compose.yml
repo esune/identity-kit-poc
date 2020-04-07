@@ -6,10 +6,16 @@ services:
   api-dev:
     image: issuer-api-dev:latest
     environment:
-      - FLASK_APP=api.py
+      - FLASK_APP=${FLASK_APP}
       - FLASK_ENV=development
-      - FLASK_RUN_PORT=5000
-      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=${FLASK_RUN_PORT}
+      - FLASK_RUN_HOST=${FLASK_RUN_HOST}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_DATABASE=${MONGODB_DATABASE}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${MONGODB_PORT}
+      - DB_USER=${MONGODB_USER}
+      - DB_PASSWORD=${MONGODB_PASSWORD}
     volumes:
       - ../api:/app
     ports:
@@ -40,7 +46,7 @@ services:
       - issuer_kit
 
   #
-  # Issuer frontend with hot reloading
+  # Issuer frontend with hot-reloading
   #
   issuer-web-dev:
     image: node:erbium

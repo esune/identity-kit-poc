@@ -211,9 +211,10 @@ configureEnvironment() {
 
   # api
   export FLASK_APP=api.py
-  export FLASK_ENV=development
   export FLASK_RUN_PORT=5000
   export FLASK_RUN_HOST=0.0.0.0
+  export DB_HOST=db
+  export SECRET_KEY="not-so-secret-12345"
 
   # issuer-web
   export ISSUER_WEB_PORT=4251
@@ -254,13 +255,13 @@ configureEnvironment() {
 
   # agent
   export LEDGER_URL=${LEDGER_URL-http://$DOCKERHOST:9000}
-  export AGENT_WALLET_NAME="identity_kit_agent"
+  export AGENT_WALLET_NAME="issuer_agent"
   export AGENT_WALLET_ENCRYPTION_KEY="key"
   export AGENT_STORAGE_WALLET_TYPE="postgres_storage"
   if [ -z "${DEV_MODE}" ]; then
     export AGENT_WALLET_SEED=$(generateSeed issuer-kit-demo)
   else
-    export AGENT_WALLET_SEED="identity_kit_0000000000000000000"
+    export AGENT_WALLET_SEED="issuer_kit_0000000000000000000"
   fi
   export AGENT_ADMIN_PORT=8024
   export AGENT_WEBHOOK_PORT=8020
@@ -406,7 +407,7 @@ case "${COMMAND}" in
   start-dev)
     isS2iInstalled
     build-api-dev
-    
+
     unset BCOVRIN_SCHEMA_ID
     unset LEDGER_URL
     unset NGROK_AGENT_ENDPOINT
