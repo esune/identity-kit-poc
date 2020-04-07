@@ -1,98 +1,8 @@
 version: "3"
 services:
   #
-  # API/Controller
+  # Issuer frontend
   #
-  identity-controller-dev:
-    image: node:erbium
-    environment:
-      - PORT=${IDENTITY_CONTROLLER_PORT}
-      - AGENT_ADMIN_URL=${AGENT_ADMIN_URL}
-      - AGENT_ADMIN_API_KEY=${AGENT_ADMIN_API_KEY}
-      - DB_SERVICE=${DB_SERVICE}
-      - DB_NAME=${MONGODB_DATABASE}
-      - DB_USER=${MONGODB_USER}
-      - DB_PASSWORD=${MONGODB_PASSWORD}
-      - DB_PORT=${MONGODB_PORT}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - PUBLIC_SITE_URL=${PUBLIC_SITE_URL}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - SMTP_USERNAME=${SMTP_USERNAME}
-      - SMTP_PASS=${SMTP_PASS}
-      - EXISTING_SCHEMA_ID=${EXISTING_SCHEMA_ID}
-      - CUSTOM_SCHEMA_PATH=${CUSTOM_SCHEMA_PATH}
-    volumes:
-      - ../identity-controller:/usr/src/controller
-    ports:
-      - ${IDENTITY_CONTROLLER_PORT}:${IDENTITY_CONTROLLER_PORT}
-    networks:
-      - identity_kit
-    working_dir: /usr/src/controller
-    depends_on:
-      - wa-db
-    command: npm run start-docker
-
-  identity-controller:
-    image: identity-kit-controller:latest
-    environment:
-      - PORT=${IDENTITY_CONTROLLER_PORT}
-      - AGENT_ADMIN_URL=${AGENT_ADMIN_URL}
-      - AGENT_ADMIN_API_KEY=${AGENT_ADMIN_API_KEY}
-      - DB_SERVICE=${DB_SERVICE}
-      - DB_NAME=${MONGODB_DATABASE}
-      - DB_USER=${MONGODB_USER}
-      - DB_PASSWORD=${MONGODB_PASSWORD}
-      - DB_PORT=${MONGODB_PORT}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - PUBLIC_SITE_URL=${PUBLIC_SITE_URL}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - EXISTING_SCHEMA_ID=${EXISTING_SCHEMA_ID}
-      - CUSTOM_SCHEMA_PATH=${CUSTOM_SCHEMA_PATH}
-      - S2I_SCRIPTS_PATH=${STI_SCRIPTS_PATH}
-    ports:
-      - ${IDENTITY_CONTROLLER_PORT}:${IDENTITY_CONTROLLER_PORT}
-    networks:
-      - identity_kit
-    depends_on:
-      - wa-db
-    command: >
-      /bin/bash -c "
-      echo waiting for database...;
-      sleep 15;
-      ${S2I_SCRIPTS_PATH}/run;"
-
-  #
-  # Admin frontend with hot-reloading
-  #
-  wa-admin-dev:
-    image: node:erbium
-    volumes:
-      - ../wa-admin:/usr/src/wa-admin
-    working_dir: /usr/src/wa-admin
-    ports:
-      - ${WA_ADMIN_PORT}:${WA_ADMIN_PORT}
-    networks:
-      - identity_kit
-    command: npm run start-docker
-
-  wa-admin:
-    image: wa-admin:latest
-    environment:
-      - WEB_HOST_NAME=${ADMIN_WEB_HOST_NAME}
-      - WEB_HOST_PORT=${ADMIN_WEB_HOST_PORT}
-      - WEB_HOST_TLS=${ADMIN_WEB_HOST_TLS}
-      - API_HOST=${ADMIN_API_HOST}
-      - API_PORT=${ADMIN_API_PORT}
-    volumes:
-      - ./wa-admin/config/Caddyfile:/etc/Caddyfile
-      - ./wa-admin/config/form-template.json:/src/assets/config/form-template.json
-    ports:
-      - ${ADMIN_WEB_HOST_PORT}:${ADMIN_WEB_HOST_PORT}
-    networks:
-      - identity_kit
-
   issuer-web:
     image: issuer-web:latest
     environment:
@@ -113,7 +23,7 @@ services:
       - identity_kit
 
   #
-  # Public frontend with hot-reloading
+  # Issuer frontend
   #
   issuer-web-dev:
     image: node:erbium
@@ -127,9 +37,9 @@ services:
     command: npm run serve
 
   #
-  # wa-db
+  # db
   #
-  wa-db:
+  db:
     image: registry.access.redhat.com/rhscl/mongodb-36-rhel7
     environment:
       - MONGODB_ADMIN_PASSWORD=${MONGODB_ADMIN_PASSWORD}
@@ -137,7 +47,7 @@ services:
       - MONGODB_PASSWORD=${MONGODB_PASSWORD}
       - MONGODB_DATABASE=${MONGODB_DATABASE}
     volumes:
-      - wa-db-data:/var/lib/mongodb/data
+      - db-data:/var/lib/mongodb/data
     ports:
       - ${MONGODB_PORT}:${MONGODB_PORT}
     networks:
@@ -179,9 +89,9 @@ services:
       - keycloak-db-data:/var/lib/pgsql/data
 
   #
-  # Identity Kit Agent
+  # Agent
   #
-  identity-kit-agent:
+  agent:
     image: bcgovimages/aries-cloudagent:py36-1.14-1_0.4.5
     environment:
       - LEDGER_URL=${LEDGER_URL}
@@ -204,7 +114,7 @@ services:
       - ${AGENT_HTTP_INTERFACE_PORT}:${AGENT_HTTP_INTERFACE_PORT}
       - ${AGENT_ADMIN_PORT}:${AGENT_ADMIN_PORT}
     depends_on:
-      - identity-kit-wallet
+      - wallet
     entrypoint: /bin/bash
     command: [
         "-c",
@@ -237,7 +147,7 @@ services:
   #
   # Identity Kit Wallet
   #
-  identity-kit-wallet:
+  wallet:
     image: registry.access.redhat.com/rhscl/postgresql-10-rhel7:latest
     environment:
       - POSTGRESQL_USER=${WALLET_USER}
@@ -249,12 +159,12 @@ services:
     ports:
       - ${WALLET_PORT}:${WALLET_PORT}
     volumes:
-      - identity-kit-wallet-data:/var/lib/pgsql/data
+      - wallet-data:/var/lib/pgsql/data
 
 networks:
   identity_kit:
 
 volumes:
   keycloak-db-data:
-  identity-kit-wallet-data:
-  wa-db-data:
+  wallet-data:
+  db-data:

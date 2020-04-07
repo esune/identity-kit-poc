@@ -3,5 +3,6 @@ Flask-Admin
 Flask-Restplus
 Werkzeug==0.16.1
 Flask-Mongoengine
-Flask-Login>=0.3.0
+# Flask-Login>=0.3.0
 Pillow
+flask-oidc-ex
