@@ -1,6 +1,5 @@
+import flask
 from flask_admin import AdminIndexView, expose
-
-from ..api import oidc
 
 
 class MyHomeView(AdminIndexView):
@@ -9,7 +8,13 @@ class MyHomeView(AdminIndexView):
         return self.render("admin/index.html")
 
     def is_accessible(self):
-        return oidc.user_loggedin
+        if flask.g.oidc_id_token is not None:
+            return True
+        else:
+            return flask.redirect(flask.url_for("login"))
 
     def is_visible(self):
-        return oidc.user_loggedin
+        if flask.g.oidc_id_token is not None:
+            return True
+        else:
+            return False

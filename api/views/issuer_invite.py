@@ -4,7 +4,7 @@ import json
 from flask_admin import BaseView
 from flask_admin.contrib.mongoengine import ModelView
 
-from widgets.surveyjs import SurveyJSField
+from ..widgets.surveyjs import SurveyJSField
 
 
 class IssuerInviteView(ModelView, BaseView):

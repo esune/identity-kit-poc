@@ -1,13 +1,13 @@
 import os
 
 import flask_admin as admin
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_mongoengine import MongoEngine
 from flask_oidc_ex import OpenIDConnect
 
-from models.issuer_invite import IssuerInvite
-from views.issuer_invite import IssuerInviteView
-from views.my_home import MyHomeView
+from .models.issuer_invite import IssuerInvite
+from .views.issuer_invite import IssuerInviteView
+from .views.my_home import MyHomeView
 
 
 def parse_bool(val):
@@ -31,7 +31,7 @@ app.config.update(
         },
         "TESTING": parse_bool(debug),
         "DEBUG": parse_bool(debug),
-        "OIDC_CLIENT_SECRETS": "config/client_secrets.json",
+        "OIDC_CLIENT_SECRETS": "client_secrets.json",
         "OIDC_SCOPES": ["openid", "email", "profile"],
     }
 )
@@ -42,6 +42,12 @@ db.init_app(app)
 
 # Init OIDC manager
 oidc = OpenIDConnect(app)
+
+
+@app.route("/login")
+@oidc.require_login
+def login():
+    return redirect(url_for("/"))
 
 
 # Create admin

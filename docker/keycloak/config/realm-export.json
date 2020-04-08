@@ -271,18 +271,17 @@
           "attributes": {}
         }
       ],
-      "identity-kit-admin": [
+      "identity-kit-api": [
         {
-          "id": "fd2959c0-d16c-4484-8661-0ed42be3d854",
-          "name": "wa-admin",
-          "description": "Grants access to the Admin interface of the identity-kit webapp.",
+          "id": "665b7566-5570-4e54-88c9-9c2f02b01ca9",
+          "name": "admin",
+          "description": "Administrator",
           "composite": false,
           "clientRole": true,
-          "containerId": "d02ae41c-5cb8-4883-a66b-a059aff2509c",
+          "containerId": "a69d68f7-e051-4108-b5ce-13b3f37e7671",
           "attributes": {}
         }
       ],
-      "identity-kit-api": [],
       "security-admin-console": [],
       "admin-cli": [],
       "broker": [
@@ -386,8 +385,8 @@
         "uma_authorization"
       ],
       "clientRoles": {
-        "identity-kit-admin": [
-          "wa-admin"
+        "identity-kit-api": [
+          "admin"
         ],
         "account": [
           "manage-account",
@@ -570,72 +569,21 @@
       ]
     },
     {
-      "id": "d02ae41c-5cb8-4883-a66b-a059aff2509c",
-      "clientId": "identity-kit-admin",
+      "id": "a69d68f7-e051-4108-b5ce-13b3f37e7671",
+      "clientId": "identity-kit-api",
       "surrogateAuthRequired": false,
       "enabled": true,
+      "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "4880a721-b932-4470-aa05-29d322ebf98a",
       "redirectUris": [
-        "http://localhost:4250/*",
-        "http://localhost:8081/*"
+        "http://localhost:5000/*"
       ],
       "webOrigins": [
         "+"
       ],
       "notBefore": 0,
       "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": false,
-      "protocol": "openid-connect",
-      "attributes": {
-        "saml.assertion.signature": "false",
-        "saml.force.post.binding": "false",
-        "saml.multivalued.roles": "false",
-        "saml.encrypt": "false",
-        "saml.server.signature": "false",
-        "saml.server.signature.keyinfo.ext": "false",
-        "exclude.session.state.from.auth.response": "false",
-        "saml_force_name_id_format": "false",
-        "saml.client.signature": "false",
-        "tls.client.certificate.bound.access.tokens": "false",
-        "saml.authnstatement": "false",
-        "display.on.consent.screen": "false",
-        "saml.onetimeuse.condition": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "role_list",
-        "profile",
-        "roles",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
-      "id": "a69d68f7-e051-4108-b5ce-13b3f37e7671",
-      "clientId": "identity-kit-api",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
-      "redirectUris": [],
-      "webOrigins": [],
-      "notBefore": 0,
-      "bearerOnly": true,
       "consentRequired": false,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
