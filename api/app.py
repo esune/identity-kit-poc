@@ -64,25 +64,21 @@ def load_user(user_id):
 def register():
     form = RegistrationForm()
     if request.method == "POST":
-        app.logger.debug("POST registration")
         app.logger.debug(form.__dict__)
         if form.validate():
-            app.logger.debug("form is VALID")
             existing_user = User.objects(email=form.email.data).first()
             if existing_user is None:
                 hashpass = generate_password_hash(form.password.data, method="sha256")
                 hey = User(email=form.email.data, password=hashpass).save()
                 login_user(hey)
-                app.logger.debug("22222 %s", hey)
-                return redirect(url_for("dashboard"))
-    app.logger.debug("GET registration")
+                return redirect(url_for("admin.index"))
     return render_template("register.html", form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated == True:
-        return redirect(url_for("dashboard"))
+    if current_user.is_authenticated is True:
+        return redirect(url_for("admin.index"))
     form = RegistrationForm()
     if request.method == "POST":
         if form.validate():
@@ -90,14 +86,8 @@ def login():
             if check_user:
                 if check_password_hash(check_user["password"], form.password.data):
                     login_user(check_user)
-                    return redirect(url_for("dashboard"))
+                    return redirect(url_for("admin.index"))
     return render_template("login.html", form=form)
-
-
-@app.route("/dashboard")
-@login_required
-def dashboard():
-    return render_template("dashboard.html", name=current_user.email)
 
 
 @app.route("/logout", methods=["GET"])
