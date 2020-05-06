@@ -1,8 +1,10 @@
-Flask
-Flask-Admin
-Flask-Restplus
-Werkzeug==0.16.1
-Flask-Mongoengine
-# Flask-Login>=0.3.0
-Pillow
-flask-oidc-ex
+flask
+flask-admin
+# Flask-Restplus
+werkzeug
+email-validator
+# Werkzeug==0.16.1
+flask-mongoengine
+flask-login
+pillow
+# flask-oidc-ex
