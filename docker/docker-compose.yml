@@ -17,6 +17,10 @@ services:
       - DB_PORT=${MONGODB_PORT}
       - DB_USER=${MONGODB_USER}
       - DB_PASSWORD=${MONGODB_PASSWORD}
+      - KEYCLOAK_HOST=${KEYCLOAK_HOST}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT=${KEYCLOAK_CLIENT}
+      - KEYCLOAK_SECRET=${KEYCLOAK_SECRET}
     volumes:
       - ../api:/app
     ports:
@@ -95,6 +99,8 @@ services:
       KEYCLOAK_IMPORT: ${KEYCLOAK_IMPORT}
     volumes:
       - ../docker/keycloak/config/realm-export-docker.json:/tmp/realm-export-docker.json
+    networks:
+      - issuer_kit
     ports:
       - 8180:8080
     depends_on:
@@ -111,6 +117,8 @@ services:
       POSTGRESQL_DATABASE: ${KEYCLOAK_DB_NAME}
     volumes:
       - keycloak-db-data:/var/lib/pgsql/data
+    networks:
+      - issuer_kit
 
   #
   # Agent

@@ -215,6 +215,10 @@ configureEnvironment() {
   export FLASK_RUN_HOST=0.0.0.0
   export DB_HOST=db
   export SECRET_KEY="not-so-secret-12345"
+  export KEYCLOAK_HOST=${KEYCLOAK_HOST:-http://localhost:8180}
+  export KEYCLOAK_REALM=${KEYCLOAK_REALM:-identity-kit}
+  export KEYCLOAK_CLIENT=${KEYCLOAK_CLIENT:-identity-kit-api}
+  export KEYCLOAK_SECRET=${KEYCLOAK_SECRET:-4880a721-b932-4470-aa05-29d322ebf98a}
 
   # issuer-web
   export ISSUER_WEB_PORT=4251

@@ -1,15 +1,16 @@
-from flask import redirect, url_for
+import os
+
+from flask import render_template, session
 from flask_admin import AdminIndexView, expose
-from flask_login import login_required, logout_user
 
 
 class MyHomeView(AdminIndexView):
     @expose("/")
-    @login_required
+    @auth.oidc_auth("default")
     def index(self):
-        return super(MyHomeView, self).index()
-
-    @expose("/logout/")
-    def logout_view(self):
-        logout_user()
-        return redirect(url_for(".index"))
+        id_token = session["id_token"]
+        client_name = os.environ.get("KEYCLOAK_CLIENT")
+        if client_name in id_token and "admin" in id_token[client_name]["roles"]:
+            return super(MyHomeView, self).index()
+        else:
+            return render_template("unauthorized.html")

@@ -1,22 +1,19 @@
 import os
 
 import flask_admin as admin
-from flask import Flask, redirect, render_template, request, url_for
-from flask_login import (
-    LoginManager,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from flask_mongoengine import MongoEngine
-from werkzeug.security import check_password_hash, generate_password_hash
+from flask_pyoidc import OIDCAuthentication
+from flask_pyoidc.provider_configuration import (
+    ClientMetadata,
+    ProviderConfiguration,
+    ProviderMetadata,
+)
 
-from .forms.registration import RegistrationForm
 from .models.issuer_invite import IssuerInvite
-from .models.user import User
 from .views.issuer_invite import IssuerInviteView
-from .views.my_home import MyHomeView
+
+# from .views.my_home import MyHomeView
 
 
 def parse_bool(val):
@@ -40,8 +37,7 @@ app.config.update(
         },
         "TESTING": parse_bool(debug),
         "DEBUG": parse_bool(debug),
-        "OIDC_CLIENT_SECRETS": "client_secrets.json",
-        "OIDC_SCOPES": ["openid", "email", "profile"],
+        "OIDC_REDIRECT_URI": "http://localhost:5000/redirect_uri",
     }
 )
 
@@ -49,56 +45,55 @@ app.config.update(
 db = MongoEngine()
 db.init_app(app)
 
-# Init login manager
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
+# provider_metadata = ProviderMetadata(
+#     issuer="https://sso-test.pathfinder.gov.bc.ca/auth/realms/gzyg46lx",
+#     authorization_endpoint="https://sso-test.pathfinder.gov.bc.ca/auth/realms/gzyg46lx/protocol/openid-connect/auth",
+#     token_endpoint="https://sso-test.pathfinder.gov.bc.ca/auth/realms/gzyg46lx/protocol/openid-connect/token",
+#     userinfo_endpoint="https://sso-test.pathfinder.gov.bc.ca/auth/realms/gzyg46lx/protocol/openid-connect/userinfo",
+#     jwks_uri="https://sso-test.pathfinder.gov.bc.ca/auth/realms/gzyg46lx/protocol/openid-connect/certs",
+# )
+
+# Init OIDC client
+config = ProviderConfiguration(
+    # issuer=f"{os.environ.get('KEYCLOAK_HOST')}/auth/realms/{os.environ.get('KEYCLOAK_REALM')}",
+    issuer="https://sso-test.pathfinder.gov.bc.ca/auth/realms/gzyg46lx",
+    # provider_metadata=provider_metadata,
+    client_metadata=ClientMetadata(
+        client_id=os.environ.get("KEYCLOAK_CLIENT"),
+        # client_secret=os.environ.get("KEYCLOAK_SECRET"),
+        client_secret="f9c8761a-d241-4490-af58-9a2e0f40552c",
+    ),
+)
+auth = OIDCAuthentication({"default": config}, app)
+
+from flask_admin import AdminIndexView, expose
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.objects(pk=user_id).first()
+class MyHomeView(AdminIndexView):
+    @expose("/")
+    @auth.oidc_auth("default")
+    def index(self):
+        id_token = session["id_token"]
+        client_name = os.environ.get("KEYCLOAK_CLIENT")
+        if client_name in id_token and "admin" in id_token[client_name]["roles"]:
+            return super(MyHomeView, self).index()
+        else:
+            return "You are unauthorized"
 
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    form = RegistrationForm()
-    if request.method == "POST":
-        app.logger.debug(form.__dict__)
-        if form.validate():
-            existing_user = User.objects(email=form.email.data).first()
-            if existing_user is None:
-                hashpass = generate_password_hash(form.password.data, method="sha256")
-                hey = User(email=form.email.data, password=hashpass).save()
-                login_user(hey)
-                return redirect(url_for("admin.index"))
-    return render_template("register.html", form=form)
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if current_user.is_authenticated is True:
-        return redirect(url_for("admin.index"))
-    form = RegistrationForm()
-    if request.method == "POST":
-        if form.validate():
-            check_user = User.objects(email=form.email.data).first()
-            if check_user:
-                if check_password_hash(check_user["password"], form.password.data):
-                    login_user(check_user)
-                    return redirect(url_for("admin.index"))
-    return render_template("login.html", form=form)
-
-
-@app.route("/logout", methods=["GET"])
-@login_required
+@app.route("/logout")
+@auth.oidc_logout
 def logout():
-    logout_user()
-    return redirect(url_for("login"))
+    return render_template("logout.html")
+
+
+@app.route("/unauthorized")
+def unauthorized():
+    return render_template("unauthorized.html")
 
 
 # Create admin
-admin = admin.Admin(app, index_view=MyHomeView(name="Home", url="/admin"))
+admin = admin.Admin(app, index_view=MyHomeView(name="Home", url="/"))
 
 # Add views
 admin.add_view(IssuerInviteView(IssuerInvite))
