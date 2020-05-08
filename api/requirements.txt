@@ -3,10 +3,8 @@ email-validator
 flask
 flask-admin
 flask-login
+flask-mail
 flask-mongoengine
 flask-pyoidc
 pillow
 werkzeug
-# Flask-Restplus
-# Werkzeug==0.16.1
-# flask-oidc-ex

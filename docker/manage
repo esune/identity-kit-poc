@@ -170,6 +170,27 @@ build-api-dev() {
     -f '../docker/api/Dockerfile.dev' '../'
 }
 
+# build-api-dev() {
+#   BASE_IMAGE="registry.fedoraproject.org/f32/python3"
+#   echo -e "\nBuilding issuer-api-dev image from ${BASE_IMAGE}..."
+#   ${S2I_EXE} build \
+#     -e "UPGRADE_PIP_TO_LATEST=true" \
+#     -e "PIP_NO_CACHE_DIR=" \
+#     -v "${COMPOSE_PROJECT_NAME}-pip-cache:/opt/app-root/.cache/pip" \
+#     '../api' \
+#     "$BASE_IMAGE" \
+#     'issuer-api-dev'
+
+#   # this is only required in Windows
+#   # if [[ "$OSTYPE" == "msys" ]]; then
+#   #   echo -e "\nFixing file permissions in final dcbr-api image"
+#   #   docker build -q \
+#   #     --build-arg BASE_IMAGE='dcbr-api:latest' \
+#   #     -t 'dcbr-api' \
+#   #     -f 'utils/fix-permissions/Dockerfile' 'utils/'
+#   # fi
+# }
+
 build-all() {
   build-issuer-web
 }
@@ -210,15 +231,17 @@ configureEnvironment() {
   export DEBUG=${DEBUG}
 
   # api
-  export FLASK_APP=app
+  export FLASK_APP=server.py
   export FLASK_RUN_PORT=5000
   export FLASK_RUN_HOST=0.0.0.0
   export DB_HOST=db
   export SECRET_KEY="not-so-secret-12345"
   export KEYCLOAK_HOST=${KEYCLOAK_HOST:-http://localhost:8180}
   export KEYCLOAK_REALM=${KEYCLOAK_REALM:-identity-kit}
-  export KEYCLOAK_CLIENT=${KEYCLOAK_CLIENT:-identity-kit-api}
-  export KEYCLOAK_SECRET=${KEYCLOAK_SECRET:-4880a721-b932-4470-aa05-29d322ebf98a}
+  export OIDC_ISSUER=${OIDC_ISSUER:-"$KEYCLOAK_HOST/auth/realms/$KEYCLOAK_REALM"}
+  export OIDC_CLIENT=${OIDC_CLIENT:-identity-kit-api}
+  export OIDC_SECRET=${OIDC_SECRET:-4880a721-b932-4470-aa05-29d322ebf98a}
+  export OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI:-http://localhost:5000/redirect_uri}
 
   # issuer-web
   export ISSUER_WEB_PORT=4251
@@ -323,7 +346,7 @@ getStartupParams() {
 }
 
 deleteVolumes() {
-  _projectName=${COMPOSE_PROJECT_NAME:-docker}
+  _projectName=${COMPOSE_PROJECT_NAME:-issuer-kit}
 
   echo "Stopping and removing any running containers ..."
   docker-compose down -v
@@ -410,7 +433,6 @@ case "${COMMAND}" in
     ;;
   start-dev)
     isS2iInstalled
-    build-api-dev
 
     unset BCOVRIN_SCHEMA_ID
     unset LEDGER_URL
@@ -420,6 +442,8 @@ case "${COMMAND}" in
     export AGENT_WEBHOOK_URL="http://identity-controller-dev:5000"
 
     configureEnvironment "$@"
+    build-api-dev
+
     customizeKeycloakConfig
     docker-compose up -d ${_startupParams} ${DEFAULT_CONTAINERS} ${DEV_CONTAINERS}
     docker-compose logs -f
