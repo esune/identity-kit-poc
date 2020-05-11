@@ -1,7 +1,7 @@
 from flask import redirect, session, url_for
 from flask_admin import AdminIndexView, expose
 
-from app.auth.oidc import auth
+from app import auth
 from config import Config
 
 

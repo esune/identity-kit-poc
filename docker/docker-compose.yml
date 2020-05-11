@@ -20,6 +20,7 @@ services:
       - OIDC_ISSUER=${OIDC_ISSUER}
       - OIDC_CLIENT=${OIDC_CLIENT}
       - OIDC_SECRET=${OIDC_SECRET}
+      - OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI}
     volumes:
       - ../api:/app
     ports:

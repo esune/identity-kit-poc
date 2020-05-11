@@ -1,7 +1,7 @@
 from flask import redirect, render_template, url_for
 
+from app import auth
 from app.auth import bp
-from app.auth.oidc import auth
 
 
 @bp.route("/logout")
