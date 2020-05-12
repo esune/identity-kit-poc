@@ -29,7 +29,9 @@ def create_app(config_class=Config):
         app.register_blueprint(auth_bp, url_prefix="/auth")
 
         # create admin dashboard and custom view
-        admin = flask_admin.Admin(app, index_view=MyHomeView(name="Home", url="/admin"))
+        admin = flask_admin.Admin(
+            app=app, index_view=MyHomeView(name="Home", url="/admin")
+        )
         admin.add_view(IssuerInviteView(IssuerInvite))
 
     return app

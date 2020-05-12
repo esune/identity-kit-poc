@@ -241,7 +241,8 @@ configureEnvironment() {
   export OIDC_ISSUER=${OIDC_ISSUER:-"$KEYCLOAK_HOST/auth/realms/$KEYCLOAK_REALM"}
   export OIDC_CLIENT=${OIDC_CLIENT:-identity-kit-api}
   export OIDC_SECRET=${OIDC_SECRET:-4880a721-b932-4470-aa05-29d322ebf98a}
-  export OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI:-http://localhost:5000/redirect_uri}
+  export OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI:-http://localhost:5000/admin}
+  export OIDC_POST_LOGOUT_REDIRECT_URI=${OIDC_POST_LOGOUT_REDIRECT_URI:-http://localhost:5000/auth/logout}
 
   # issuer-web
   export ISSUER_WEB_PORT=4251

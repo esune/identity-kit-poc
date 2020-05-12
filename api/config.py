@@ -30,3 +30,4 @@ class Config(object):
     OIDC_ISSUER = os.environ.get("OIDC_ISSUER")
     OIDC_CLIENT = os.environ.get("OIDC_CLIENT")
     OIDC_SECRET = os.environ.get("OIDC_SECRET")
+    OIDC_POST_LOGOUT_REDIRECT_URI = os.environ.get("OIDC_POST_LOGOUT_REDIRECT_URI")

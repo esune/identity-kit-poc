@@ -18,4 +18,4 @@ class MyHomeView(AdminIndexView):
         ):
             return super(MyHomeView, self).index()
         else:
-            return redirect(url_for("unauthorized"))
+            return redirect(url_for("auth.unauthorized"))

@@ -21,6 +21,7 @@ services:
       - OIDC_CLIENT=${OIDC_CLIENT}
       - OIDC_SECRET=${OIDC_SECRET}
       - OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI}
+      - OIDC_POST_LOGOUT_REDIRECT_URI=${OIDC_POST_LOGOUT_REDIRECT_URI}
     volumes:
       - ../api:/app
     ports:
