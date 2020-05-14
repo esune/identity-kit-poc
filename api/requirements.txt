@@ -6,5 +6,6 @@ flask-login
 flask-mail
 flask-mongoengine
 flask-pyoidc
+flask-restplus
 pillow
-werkzeug
+werkzeug==0.16.1
