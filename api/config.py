@@ -16,7 +16,6 @@ class Config(object):
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_FROM_ADDR = os.environ.get("MAIL_FROM_ADDR")
-    ADMINS = ["admin@issuer-kit.org"]
     MONGODB_SETTINGS = {
         "db": os.environ.get("DB_DATABASE"),
         "host": os.environ.get("DB_HOST"),
@@ -31,3 +30,4 @@ class Config(object):
     OIDC_CLIENT = os.environ.get("OIDC_CLIENT")
     OIDC_SECRET = os.environ.get("OIDC_SECRET")
     OIDC_POST_LOGOUT_REDIRECT_URI = os.environ.get("OIDC_POST_LOGOUT_REDIRECT_URI")
+    AGENT_ADMIN_API_KEY = os.environ.get("AGENT_ADMIN_API_KEY")

@@ -22,6 +22,7 @@ services:
       - OIDC_SECRET=${OIDC_SECRET}
       - OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI}
       - OIDC_POST_LOGOUT_REDIRECT_URI=${OIDC_POST_LOGOUT_REDIRECT_URI}
+      - AGENT_ADMIN_API_KEY=${AGENT_ADMIN_API_KEY}
     volumes:
       - ../api:/app
     ports:

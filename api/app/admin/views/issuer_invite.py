@@ -5,6 +5,8 @@ from flask import session
 from flask_admin import BaseView
 from flask_admin.contrib.mongoengine import ModelView
 
+from app.email import send_email
+
 from ..widgets.surveyjs import SurveyJSField
 
 
@@ -33,3 +35,10 @@ class IssuerInviteView(ModelView, BaseView):
 
         # deserialize data object and store it
         model.data = json.loads(model.data)
+
+        if not model.invite_sent:
+            subject = "Test"
+            sender = "Sender"
+            text_body = "Test Email"
+            html_body = "<p>Test Email</p>"
+            send_email(subject, sender, [model.email], text_body, html_body)

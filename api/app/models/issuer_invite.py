@@ -6,7 +6,9 @@ from flask_mongoengine import MongoEngine
 
 class IssuerInvite(MongoEngine().Document):
     token = MongoEngine().StringField(max_length=36, default=lambda: str(uuid.uuid4()))
+    
     email = MongoEngine().EmailField(required=True)
+    invite_sent = MongoEngine().BooleanField(default=False)
 
     issued = MongoEngine().BooleanField(default=False)
     expired = MongoEngine().BooleanField(default=False)
